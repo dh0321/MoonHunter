@@ -76,6 +76,8 @@ DerivedDataCache/*
 # Assets from EpicGames
 # Content/Assets/[ASSET NAME]/*
 # !Content/Assets/[ASSET NAME]/.gitkeep
+Content/Assests/AnimalVarietyPack/*
+!Content/Assets/AnimalVarietyPack/.gitkeep
 Content/Assests/Scanned3DPeoplePack/*
 !Content/Assets/Scanned3DPeoplePack/.gitkeep
 Content/Assests/Animations/*
