@@ -16,6 +16,8 @@ class MOONHUNTERPROJECT_API UWolfAnimInstance : public UAnimInstance
 	
 public:
 
+	//UWolfAnimInstance();
+
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaTime) override;
 
@@ -23,10 +25,16 @@ public:
 	class AWolf* Wolf;
 
 	UPROPERTY(BlueprintReadOnly)
+	class UAnimInstance* UE_AnimInstance;
+
+	UPROPERTY(BlueprintReadOnly)
 	class UCharacterMovementComponent* WolfMovement;
 
-	UPROPERTY(BlueprintReadOnly, Category = Movement)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
 	float GroundSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
+	float Direction;
 
 	UPROPERTY(BlueprintReadOnly, Category = Movement)
 	bool IsFalling;
