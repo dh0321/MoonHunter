@@ -12,6 +12,7 @@ APerson::APerson()
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(GetRootComponent());
+
 	SpringArm->TargetArmLength = 500.f;
 	SpringArm->SetRelativeRotation(FRotator::ZeroRotator);
 	SpringArm->bUsePawnControlRotation = true;
@@ -20,18 +21,19 @@ APerson::APerson()
 	SpringArm->bInheritYaw = true;
 	SpringArm->bDoCollisionTest = true;
 
-
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Camera->SetupAttachment(SpringArm);
-
-	AutoPossessPlayer = EAutoReceiveInput::Player0;
-
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 360.f, 0.f);
+	GetCharacterMovement()->bUseControllerDesiredRotation = false;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 600.f, 0.f);
+
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera->SetupAttachment(SpringArm);
+
+	AutoPossessPlayer = EAutoReceiveInput::Disabled;
+
 
 }
 
@@ -60,6 +62,7 @@ void APerson::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis(FName("LookUp"), this, &APerson::LookUp);
 
 	PlayerInputComponent->BindAction(FName("Jump"), IE_Pressed, this, &APerson::Jump);
+
 }
 
 void APerson::MoveForward(float Value)
@@ -95,3 +98,5 @@ void APerson::LookUp(float Value)
 {
 	AddControllerPitchInput(Value);
 }
+
+

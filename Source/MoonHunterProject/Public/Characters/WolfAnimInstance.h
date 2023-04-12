@@ -25,9 +25,6 @@ public:
 	class AWolf* Wolf;
 
 	UPROPERTY(BlueprintReadOnly)
-	class UAnimInstance* UE_AnimInstance;
-
-	UPROPERTY(BlueprintReadOnly)
 	class UCharacterMovementComponent* WolfMovement;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
@@ -37,8 +34,7 @@ public:
 	float Direction;
 
 	UPROPERTY(BlueprintReadOnly, Category = Movement)
-	bool IsFalling;
-
+	bool IsInAir;
 
 private:
 

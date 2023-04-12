@@ -23,11 +23,14 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	class UCharacterMovementComponent* PersonMovement;
 
-	UPROPERTY(BlueprintReadOnly, Category = Movement)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
 	float GroundSpeed;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
+	float Direction;
+
 	UPROPERTY(BlueprintReadOnly, Category = Movement)
-	bool IsFalling;
+	bool IsInAir;
 
 
 private:

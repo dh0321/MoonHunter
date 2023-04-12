@@ -82,3 +82,7 @@ Content/Assests/Scanned3DPeoplePack/*
 !Content/Assets/Scanned3DPeoplePack/.gitkeep
 Content/Assests/Animations/*
 !Content/Assets/Animations/.gitkeep
+Content/Assests/FOX/*
+!Content/Assets/FOX/.gitkeep
+Content/Assests/Blink/*
+!Content/Assets/Blink/.gitkeep

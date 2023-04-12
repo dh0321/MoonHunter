@@ -6,10 +6,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
-//UWolfAnimInstance::UWolfAnimInstance()
-//{
-//	GroundSpeed = 0.f;
-//}
 
 void UWolfAnimInstance::NativeInitializeAnimation()
 {
@@ -45,14 +41,16 @@ void UWolfAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	{
 		Wolf = Cast<AWolf>(TryGetPawnOwner());
 	}
+	//AWolf *Wolf = Cast<AWolf>(TryGetPawnOwner());
+
 	if (Wolf)
 	{
-		FVector Velocity = Wolf->GetVelocity();
+		FVector Velocity = Wolf->GetVelocity(); //속도
 		Velocity.Z = 0;
-		GroundSpeed = Velocity.Size();
-		Direction = (UE_AnimInstance->CalculateDirection(Velocity, Wolf->GetActorRotation()));
+		GroundSpeed = Velocity.Size(); //속력, normalize하면 방향만
+		Direction = CalculateDirection(Velocity, Wolf->GetActorRotation());
+		IsInAir = Wolf->GetMovementComponent()->IsFalling();
 	}
-
 }
 
 

@@ -63,6 +63,7 @@ void AWolf::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis(FName("LookUp"), this, &AWolf::LookUp);
 
 	PlayerInputComponent->BindAction(FName("Jump"), IE_Pressed, this, &AWolf::Jump);
+	//PlayerInputComponent->BindAction(FName("Switch"), IE_Pressed, this, &AWolf::SwitchCharacter);
 
 }
 
@@ -100,4 +101,18 @@ void AWolf::LookUp(float Value)
 {
 	AddControllerPitchInput(Value);
 }
+
+//void AWolf::SwitchCharacter()
+//{
+//	if (OtherCharacter && GetController())
+//	{
+//		AController* temp = GetController();
+//		if (temp)
+//		{
+//			temp->UnPossess();
+//			temp->Possess(OtherCharacter);
+//		}
+//	}
+//
+//}
 

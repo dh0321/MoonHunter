@@ -18,21 +18,9 @@ public:
 	
 	AWolf();
 
-	virtual void Tick(float DeltaTime) override;
-
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UPROPERTY(VisibleAnywhere, Category = Camera)
-	USpringArmComponent* SpringArm;
-
-	UPROPERTY(VisibleAnywhere, Category = Camera)
-	UCameraComponent* Camera;
-
-
 protected:
 	
 	virtual void BeginPlay() override;
-
 
 private:
 
@@ -40,6 +28,21 @@ private:
 	void MoveRight(float Value);
 	void Turn(float Value);
 	void LookUp(float Value);
+	//void SwitchCharacter();
 
+public :
+
+	virtual void Tick(float DeltaTime) override;
+
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	USpringArmComponent* SpringArm;
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	UCameraComponent* Camera;
+
+	/*UPROPERTY(EditAnywhere, Category = "Possession")
+	AWolf* OtherCharacter;*/
 
 };

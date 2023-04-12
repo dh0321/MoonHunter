@@ -11,18 +11,40 @@ void UPersonAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 
 	Person = Cast<APerson>(TryGetPawnOwner());
-	if (Person)
+	/*if (Person)
 	{
 		PersonMovement = Person->GetCharacterMovement();
-	}
+	}*/
 }
 
 void UPersonAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {
-	if (PersonMovement)
+	/*if (PersonMovement)
 	{
 		GroundSpeed = UKismetMathLibrary::VSizeXY(PersonMovement->Velocity);
 		IsFalling = PersonMovement->IsFalling();
+	}*/
+
+	if (Person == nullptr)
+	{
+		Person = Cast<APerson>(TryGetPawnOwner());
 	}
+
+	if (Person)
+	{
+		FVector Velocity = Person->GetVelocity(); //속도
+		Velocity.Z = 0;
+		GroundSpeed = Velocity.Size(); //속력, normalize하면 방향만
+		Direction = CalculateDirection(Velocity, Person->GetActorRotation());
+		IsInAir = Person->GetMovementComponent()->IsFalling();
+	}
+
+	
+	/*if (PersonMovement)
+	{
+		IsFalling = PersonMovement->IsFalling();
+	}*/
+
+
 }
 
