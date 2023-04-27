@@ -14,25 +14,44 @@ class MOONHUNTERPROJECT_API UPersonAnimInstance : public UAnimInstance
 	
 public:
 
+	UPersonAnimInstance();
+
+protected:
+
 	virtual void NativeInitializeAnimation() override;
-	virtual void NativeUpdateAnimation(float DeltaTime) override;
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
-	UPROPERTY(BlueprintReadOnly)
-	class APerson* Person;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
+	TObjectPtr<class ACharacter> Owner;
 
-	UPROPERTY(BlueprintReadOnly)
-	class UCharacterMovementComponent* PersonMovement;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
+	TObjectPtr<class UCharacterMovementComponent> Movement;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
+	FVector Velocity;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
 	float GroundSpeed;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
 	float Direction;
 
-	UPROPERTY(BlueprintReadOnly, Category = Movement)
-	bool IsInAir;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
+	uint8 bIsIdle : 1;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
+	float MovingThreshould;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
+	uint8 bIsFalling : 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
+	uint8 bIsJumping : 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
+	float JumpingThreshould;
+
+	
 private:
 
 };

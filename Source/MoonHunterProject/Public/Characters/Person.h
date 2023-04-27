@@ -6,8 +6,6 @@
 #include "GameFramework/Character.h"
 #include "Person.generated.h"
 
-class USpringArmComponent;
-class UCameraComponent;
 
 UCLASS()
 class MOONHUNTERPROJECT_API APerson : public ACharacter
@@ -22,7 +20,6 @@ protected:
 	
 	virtual void BeginPlay() override;
 
-
 private:	
 	
 	void MoveForward(float Value);
@@ -36,12 +33,16 @@ public :
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(VisibleAnywhere)
-	USpringArmComponent* SpringArm;
 
-	UPROPERTY(VisibleAnywhere)
-	UCameraComponent* Camera;
+//Camera Section
+protected:
+	UPROPERTY(VisibleAnywhere, Category = Camera, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class USpringArmComponent> SpringArm;
 
-	
+	UPROPERTY(VisibleAnywhere, Category = Camera, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UCameraComponent> FollowCamera;
+
+
+
 
 };

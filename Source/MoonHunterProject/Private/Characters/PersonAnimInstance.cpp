@@ -2,48 +2,41 @@
 
 
 #include "Characters/PersonAnimInstance.h"
-#include "Characters/Person.h"
+#include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Kismet/KismetMathLibrary.h"
+
+UPersonAnimInstance::UPersonAnimInstance()
+{
+	MovingThreshould = 3.0f;
+	JumpingThreshould = 100.f;
+}
 
 void UPersonAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
-	Person = Cast<APerson>(TryGetPawnOwner());
-	/*if (Person)
+	Owner = Cast<ACharacter>(GetOwningActor());
+	if (Owner)
 	{
-		PersonMovement = Person->GetCharacterMovement();
-	}*/
+		Movement = Owner->GetCharacterMovement();
+	}
+
 }
 
-void UPersonAnimInstance::NativeUpdateAnimation(float DeltaTime)
+void UPersonAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	/*if (PersonMovement)
-	{
-		GroundSpeed = UKismetMathLibrary::VSizeXY(PersonMovement->Velocity);
-		IsFalling = PersonMovement->IsFalling();
-	}*/
-
-	if (Person == nullptr)
-	{
-		Person = Cast<APerson>(TryGetPawnOwner());
-	}
-
-	if (Person)
-	{
-		FVector Velocity = Person->GetVelocity(); //속도
-		Velocity.Z = 0;
-		GroundSpeed = Velocity.Size(); //속력, normalize하면 방향만
-		Direction = CalculateDirection(Velocity, Person->GetActorRotation());
-		IsInAir = Person->GetMovementComponent()->IsFalling();
-	}
-
 	
-	/*if (PersonMovement)
+	Super::NativeUpdateAnimation(DeltaSeconds);
+
+	if (Movement)
 	{
-		IsFalling = PersonMovement->IsFalling();
-	}*/
+		Velocity = Movement->Velocity;
+		GroundSpeed = Velocity.Size2D();
+		Direction = CalculateDirection(Velocity, Owner->GetActorRotation());
+		bIsIdle = GroundSpeed < MovingThreshould;
+		bIsFalling = Movement->IsFalling();
+		bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);
+	}
 
 
 }
