@@ -4,6 +4,7 @@
 #include "Characters/MHCharacterBase.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Characters/MHCharacterControlData.h"
 
 
 AMHCharacterBase::AMHCharacterBase()
@@ -32,25 +33,44 @@ AMHCharacterBase::AMHCharacterBase()
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetCollisionProfileName(TEXT("CharacterMesh"));
 
-	//static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Game/Characters/Mannequins/Meshes/SKM_Quinn.SKM_Quinn"));
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Game/Assets/FOX/Mesh/SK_fox.SK_fox"));
 
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Game/Assets/FOX/Mesh/SK_fox.SK_fox"));
 	if (CharacterMeshRef.Object)
 	{
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
 	}
 
 	////static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Characters/Mannequin_UE4/ABP_Quinn.ABP_Quinn_C"));
-	//static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Animations/ABP_Person.ABP_Person"));
-	//if (AnimInstanceClassRef.Class)
-	//{
-	//	GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
-	//}
+	/*static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Animations/ABP_Person.ABP_Person_C"));
+	if (AnimInstanceClassRef.Class)
+	{
+		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
+	}*/
 
+	static ConstructorHelpers::FObjectFinder<UMHCharacterControlData> ShoulderDataRef(TEXT("/Script/MoonHunterProject.MHCharacterControlData'/Game/CharacterControl/MHC_Shoulder.MHC_Shoulder'"));
+	if (ShoulderDataRef.Object)
+	{
+		CharacterControlManager.Add(ECharacterControlType::Shoulder, ShoulderDataRef.Object);
+	}
 
+	static ConstructorHelpers::FObjectFinder<UMHCharacterControlData> QuaterDataRef(TEXT("/Script/MoonHunterProject.MHCharacterControlData'/Game/CharacterControl/MHC_Quater.MHC_Quater'"));
+	if (QuaterDataRef.Object)
+	{
+		CharacterControlManager.Add(ECharacterControlType::Quater, QuaterDataRef.Object);
+	}
+	
 
+}
 
+void AMHCharacterBase::SetCharacterControlData(const UMHCharacterControlData* CharacterControlData)
+{
+	//Pawn
+	bUseControllerRotationYaw = CharacterControlData->bUseControllerRotationYaw;
 
+	//CharacterMovement
+	GetCharacterMovement()->bOrientRotationToMovement = CharacterControlData->bOrientRotationToMovement;
+	GetCharacterMovement()->bUseControllerDesiredRotation = CharacterControlData->bUseControllerDesiredRotation;
+	GetCharacterMovement()->RotationRate = CharacterControlData->RotationRate;
 
 }
 

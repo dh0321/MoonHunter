@@ -5,5 +5,5 @@
 
 UMHCharacterControlData::UMHCharacterControlData()
 {
-	TargetArmLength = 500;
+	TargetArmLength = 500.f;
 }
