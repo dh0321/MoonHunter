@@ -41,11 +41,11 @@ AMHCharacterBase::AMHCharacterBase()
 	}
 
 	////static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Characters/Mannequin_UE4/ABP_Quinn.ABP_Quinn_C"));
-	/*static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Animations/ABP_Person.ABP_Person_C"));
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Animations/ABP_Person.ABP_Person_C"));
 	if (AnimInstanceClassRef.Class)
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
-	}*/
+	}
 
 	static ConstructorHelpers::FObjectFinder<UMHCharacterControlData> ShoulderDataRef(TEXT("/Script/MoonHunterProject.MHCharacterControlData'/Game/CharacterControl/MHC_Shoulder.MHC_Shoulder'"));
 	if (ShoulderDataRef.Object)

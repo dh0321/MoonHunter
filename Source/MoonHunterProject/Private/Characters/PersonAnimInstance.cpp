@@ -38,6 +38,5 @@ void UPersonAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);
 	}
 
-
 }
 
