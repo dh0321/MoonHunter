@@ -23,7 +23,7 @@ AMHWereWolf::AMHWereWolf()
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
-	FollowCamera->bUsePawnControlRotation = false;
+	//FollowCamera->bUsePawnControlRotation = false;
 
 
 	//Input
@@ -57,6 +57,12 @@ AMHWereWolf::AMHWereWolf()
 		QuaterMoveAction = InputActionQuaterMoveRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionAttackRef(TEXT("/Game/Input/Actions/IA_Attack.IA_Attack"));
+	if (nullptr != InputActionAttackRef.Object)
+	{
+		AttackAction = InputActionAttackRef.Object;
+	}
+
 	CurrentCharacterControlType = ECharacterControlType::Shoulder;
 
 }
@@ -81,6 +87,7 @@ void AMHWereWolf::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	EnhancedInputComponent->BindAction(ShoulderMoveAction, ETriggerEvent::Triggered, this, &AMHWereWolf::ShoulderMove);
 	EnhancedInputComponent->BindAction(ShoulderLookAction, ETriggerEvent::Triggered, this, &AMHWereWolf::ShoulderLook);
 	EnhancedInputComponent->BindAction(QuaterMoveAction, ETriggerEvent::Triggered, this, &AMHWereWolf::QuaterMove);
+	EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AMHWereWolf::Attack);
 
 }
 
@@ -147,8 +154,6 @@ void AMHWereWolf::ShoulderMove(const FInputActionValue& Value)
 	AddMovementInput(ForwardDirection, MovementVector.X);
 	AddMovementInput(RightDirection, MovementVector.Y);
 
-	UE_LOG(LogTemp, Warning, TEXT("Shoulder Move Value: %f"), &Value);
-
 }
 
 void AMHWereWolf::ShoulderLook(const FInputActionValue& Value)
@@ -157,8 +162,6 @@ void AMHWereWolf::ShoulderLook(const FInputActionValue& Value)
 
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
-
-	UE_LOG(LogTemp, Warning, TEXT("Shoulder Look Value: %f"), &Value);
 
 }
 
@@ -184,7 +187,9 @@ void AMHWereWolf::QuaterMove(const FInputActionValue& Value)
 	GetController()->SetControlRotation(FRotationMatrix::MakeFromX(MoveDirection).Rotator());
 	AddMovementInput(MoveDirection, MovementVectorSize);
 
-	UE_LOG(LogTemp, Warning, TEXT("Quater Move Value: %f"), &Value);
+}
 
-
+void AMHWereWolf::Attack()
+{
+	ProcessComboCommand();
 }

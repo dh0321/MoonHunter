@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Characters/MHCharacterControlData.h"
+#include "Animation/AnimMontage.h"
 
 
 AMHCharacterBase::AMHCharacterBase()
@@ -21,7 +22,7 @@ AMHCharacterBase::AMHCharacterBase()
 	//Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 600.f, 0.f);
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
 	GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
@@ -58,6 +59,14 @@ AMHCharacterBase::AMHCharacterBase()
 	{
 		CharacterControlManager.Add(ECharacterControlType::Quater, QuaterDataRef.Object);
 	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AnimMontageRef(TEXT("/Game/Animations/AM_PersonComboAttack.AM_PersonComboAttack"));
+	if (AnimMontageRef.Object)
+	{
+		ComboActionMontage = AnimMontageRef.Object;
+	}
+	
+	
 	
 
 }
@@ -72,5 +81,12 @@ void AMHCharacterBase::SetCharacterControlData(const UMHCharacterControlData* Ch
 	GetCharacterMovement()->bUseControllerDesiredRotation = CharacterControlData->bUseControllerDesiredRotation;
 	GetCharacterMovement()->RotationRate = CharacterControlData->RotationRate;
 
+}
+
+void AMHCharacterBase::ProcessComboCommand()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(ComboActionMontage);
+	 
 }
 
