@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Characters/MHCharacterControlData.h"
 #include "Animation/AnimMontage.h"
+#include "Characters/MHComboActionData.h"
 
 
 AMHCharacterBase::AMHCharacterBase()
@@ -65,10 +66,14 @@ AMHCharacterBase::AMHCharacterBase()
 	{
 		ComboActionMontage = AnimMontageRef.Object;
 	}
-	
-	
-	
 
+	static ConstructorHelpers::FObjectFinder<UMHComboActionData> ComboActionDataRef(TEXT("/Script/MoonHunterProject.MHComboActionData'/Game/CharacterAction/MHA_ComboAttack.MHA_ComboAttack'"));
+	if (ComboActionDataRef.Object)
+	{
+		ComboActionData = ComboActionDataRef.Object;
+	}
+	
+	
 }
 
 void AMHCharacterBase::SetCharacterControlData(const UMHCharacterControlData* CharacterControlData)
@@ -85,8 +90,80 @@ void AMHCharacterBase::SetCharacterControlData(const UMHCharacterControlData* Ch
 
 void AMHCharacterBase::ProcessComboCommand()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(ComboActionMontage);
+	if (CurrentCombo == 0)
+	{
+		ComboActionBegin();
+		return;
+	}
+
+	if (!ComboTimerHandle.IsValid())
+	{
+		HasNextComboCommand = false;
+	}
+	else
+	{
+		HasNextComboCommand = true;
+	}
 	 
+}
+
+void AMHCharacterBase::ComboActionBegin()
+{
+	//Combo Status
+	CurrentCombo = 1;
+
+	//Movement Setting
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
+	//Animation Setting
+	const float AttackSpeedRate = 1.0f;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(ComboActionMontage, AttackSpeedRate);
+
+	FOnMontageEnded EndDelegate;
+	EndDelegate.BindUObject(this, &AMHCharacterBase::ComboActionEnd);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, ComboActionMontage);
+
+	ComboTimerHandle.Invalidate();
+	SetComboCheckTimer();
+
+}
+
+void AMHCharacterBase::ComboActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
+{
+	ensure(CurrentCombo != 0);
+	CurrentCombo = 0;
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
+}
+
+void AMHCharacterBase::SetComboCheckTimer()
+{
+	int32 ComboIndex = CurrentCombo - 1;
+	ensure(ComboActionData->EffectiveFrameCount.IsValidIndex(ComboIndex));
+
+	const float AttackSpeedRate = 1.0f;
+	float ComboEffectiveTime = (ComboActionData->EffectiveFrameCount[ComboIndex] / ComboActionData->FrameRate) / AttackSpeedRate;
+
+	if (ComboEffectiveTime > 0.0f)
+	{
+		GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &AMHCharacterBase::ComboCheck, ComboEffectiveTime, false);
+	}
+
+}
+
+void AMHCharacterBase::ComboCheck()
+{
+	ComboTimerHandle.Invalidate();
+	if (HasNextComboCommand)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, ComboActionData->MaxComboCount);
+		FName NextSection = *FString::Printf(TEXT("%s%d"), *ComboActionData->MontageSectionNamePrefix, CurrentCombo);
+		AnimInstance->Montage_JumpToSection(NextSection, ComboActionMontage);
+		SetComboCheckTimer();
+		HasNextComboCommand = false;
+	}
 }
 
