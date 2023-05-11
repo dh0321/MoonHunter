@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interface/MHAnimationAttackInterface.h"
 #include "MHCharacterBase.generated.h"
 
 UENUM()
@@ -15,7 +16,7 @@ enum class ECharacterControlType : uint8
 
 
 UCLASS()
-class MOONHUNTERPROJECT_API AMHCharacterBase : public ACharacter
+class MOONHUNTERPROJECT_API AMHCharacterBase : public ACharacter, public IMHAnimationAttackInterface
 {
 	GENERATED_BODY()
 
@@ -48,5 +49,23 @@ protected:
 	int32 CurrentCombo = 0;
 	FTimerHandle ComboTimerHandle;
 	bool HasNextComboCommand = false;
+
+
+//Attack Hit Section
+protected:
+	virtual void AttackHitCheck() override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+
+//Dead Section
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> DeadMontage;
+
+	virtual void SetDead();
+	void PlayDeadAnimation();
+
+	float DeadEventDelayTime = 3.0f;
+
 
 };

@@ -7,6 +7,8 @@
 #include "Characters/MHCharacterControlData.h"
 #include "Animation/AnimMontage.h"
 #include "Characters/MHComboActionData.h"
+#include "Physics/MHCollision.h"
+#include "Engine/DamageEvents.h"
 
 
 AMHCharacterBase::AMHCharacterBase()
@@ -18,7 +20,7 @@ AMHCharacterBase::AMHCharacterBase()
 
 	//Capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.f);
-	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Pawn"));
+	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_MHCAPSULE);
 
 	//Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -33,46 +35,54 @@ AMHCharacterBase::AMHCharacterBase()
 	//Mesh
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	GetMesh()->SetCollisionProfileName(TEXT("CharacterMesh"));
+	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Game/Assets/FOX/Mesh/SK_fox.SK_fox"));
 	if (CharacterMeshRef.Object)
 	{
+		/*auto Comp = FindComponentByClass<USkeletalMeshComponent>();
+		Comp->SetSkeletalMesh(CharacterMeshRef.Object);*/
+
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
 	}
 
-	////static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Characters/Mannequin_UE4/ABP_Quinn.ABP_Quinn_C"));
 	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Animations/ABP_Person.ABP_Person_C"));
 	if (AnimInstanceClassRef.Class)
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UMHCharacterControlData> ShoulderDataRef(TEXT("/Script/MoonHunterProject.MHCharacterControlData'/Game/CharacterControl/MHC_Shoulder.MHC_Shoulder'"));
+	static ConstructorHelpers::FObjectFinder<UMHCharacterControlData> ShoulderDataRef(TEXT("/Game/CharacterControl/MHC_Shoulder.MHC_Shoulder"));
 	if (ShoulderDataRef.Object)
 	{
 		CharacterControlManager.Add(ECharacterControlType::Shoulder, ShoulderDataRef.Object);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UMHCharacterControlData> QuaterDataRef(TEXT("/Script/MoonHunterProject.MHCharacterControlData'/Game/CharacterControl/MHC_Quater.MHC_Quater'"));
+	static ConstructorHelpers::FObjectFinder<UMHCharacterControlData> QuaterDataRef(TEXT("/Game/CharacterControl/MHC_Quater.MHC_Quater"));
 	if (QuaterDataRef.Object)
 	{
 		CharacterControlManager.Add(ECharacterControlType::Quater, QuaterDataRef.Object);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> AnimMontageRef(TEXT("/Game/Animations/AM_PersonComboAttack.AM_PersonComboAttack"));
-	if (AnimMontageRef.Object)
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> ComboActionMontageRef(TEXT("/Game/Animations/AM_PersonComboAttack.AM_PersonComboAttack"));
+	if (ComboActionMontageRef.Object)
 	{
-		ComboActionMontage = AnimMontageRef.Object;
+		ComboActionMontage = ComboActionMontageRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UMHComboActionData> ComboActionDataRef(TEXT("/Script/MoonHunterProject.MHComboActionData'/Game/CharacterAction/MHA_ComboAttack.MHA_ComboAttack'"));
+	static ConstructorHelpers::FObjectFinder<UMHComboActionData> ComboActionDataRef(TEXT("/Game/CharacterAction/MHA_ComboAttack.MHA_ComboAttack"));
 	if (ComboActionDataRef.Object)
 	{
 		ComboActionData = ComboActionDataRef.Object;
 	}
 	
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(TEXT("/Game/Animations/AM_Dead.AM_Dead"));
+	if (DeadMontageRef.Object)
+	{
+		DeadMontage = DeadMontageRef.Object;
+	}
+
 	
 }
 
@@ -166,4 +176,60 @@ void AMHCharacterBase::ComboCheck()
 		HasNextComboCommand = false;
 	}
 }
+
+void AMHCharacterBase::AttackHitCheck()
+{
+	FHitResult OutHitResult;
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
+
+	const float AttackRange = 40.0f;
+	const float AttackRadius = 50.0f;
+	const float AttackDamage = 30.0f;
+	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
+	const FVector End = Start + GetActorForwardVector() * AttackRange;
+
+	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, CCHANNEL_MHACTION, FCollisionShape::MakeSphere(AttackRadius), Params);
+	if (HitDetected)
+	{
+		FDamageEvent DamageEvent;
+		OutHitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
+	}
+
+#if ENABLE_DRAW_DEBUG
+
+	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
+	float CapsuleHalfHeight = AttackRange * 0.5f;
+	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
+
+	DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 5.0f);
+
+
+#endif
+
+
+}
+
+float AMHCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	
+	SetDead();
+
+	return DamageAmount;
+}
+
+void AMHCharacterBase::SetDead()
+{
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	PlayDeadAnimation();
+	SetActorEnableCollision(false);
+}
+
+void AMHCharacterBase::PlayDeadAnimation()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->StopAllMontages(0.0f);
+	AnimInstance->Montage_Play(DeadMontage, 1.0f);
+}
+
 

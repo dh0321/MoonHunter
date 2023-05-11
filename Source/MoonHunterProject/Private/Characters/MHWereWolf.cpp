@@ -26,6 +26,7 @@ AMHWereWolf::AMHWereWolf()
 	//FollowCamera->bUsePawnControlRotation = false;
 
 
+
 	//Input
 	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionJumpRef(TEXT("/Game/Input/Actions/IA_Jump.IA_Jump"));
 	if (nullptr != InputActionJumpRef.Object)
