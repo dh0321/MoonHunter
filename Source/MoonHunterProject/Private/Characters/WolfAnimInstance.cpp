@@ -7,49 +7,36 @@
 #include "Kismet/KismetMathLibrary.h"
 
 
+UWolfAnimInstance::UWolfAnimInstance()
+{
+	MovingThreshould = 3.0f;
+	JumpingThreshould = 100.f;
+}
+
 void UWolfAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
-	Wolf = Cast<AWolf>(TryGetPawnOwner());
-	/*if (Wolf)
+	Owner = Cast<ACharacter>(GetOwningActor());
+	if (Owner)
 	{
-		WolfMovement = Wolf->GetCharacterMovement();
-	}*/
+		Movement = Owner->GetCharacterMovement();
+	}
+	
 }
 
 void UWolfAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {
 	Super::NativeUpdateAnimation(DeltaTime);
 
-	/*if (WolfMovement)
+	if (Movement)
 	{
-		GroundSpeed = UKismetMathLibrary::VSizeXY(WolfMovement->Velocity);
-		IsFalling = WolfMovement->IsFalling();
-	}*/
-
-	/*auto Pawn = TryGetPawnOwner();
-	if (::IsValid(Pawn))
-	{
-		FVector Velocity = Pawn->GetVelocity();
-		Velocity.Z = 0;
-		GroundSpeed = Velocity.Size();
-		Direction = (UE_AnimInstance->CalculateDirection(Velocity, Wolf->GetActorRotation()));
-	}*/
-
-	if (Wolf == nullptr)
-	{
-		Wolf = Cast<AWolf>(TryGetPawnOwner());
-	}
-	//AWolf *Wolf = Cast<AWolf>(TryGetPawnOwner());
-
-	if (Wolf)
-	{
-		FVector Velocity = Wolf->GetVelocity(); //속도
-		Velocity.Z = 0;
-		GroundSpeed = Velocity.Size(); //속력, normalize하면 방향만
-		Direction = CalculateDirection(Velocity, Wolf->GetActorRotation());
-		IsInAir = Wolf->GetMovementComponent()->IsFalling();
+		Velocity = Movement->Velocity;
+		GroundSpeed = Velocity.Size2D();
+		Direction = CalculateDirection(Velocity, Owner->GetActorRotation());
+		bIsIdle = GroundSpeed < MovingThreshould;
+		bIsFalling = Movement->IsFalling();
+		bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);
 	}
 }
 

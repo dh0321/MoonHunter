@@ -13,7 +13,7 @@ AMHWereWolf::AMHWereWolf()
 {
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(GetRootComponent());
-	SpringArm->TargetArmLength = 500.f;
+	SpringArm->TargetArmLength = 600.f;
 	SpringArm->SetRelativeRotation(FRotator::ZeroRotator);
 	SpringArm->bUsePawnControlRotation = true;
 	SpringArm->bInheritPitch = true;
@@ -62,7 +62,17 @@ AMHWereWolf::AMHWereWolf()
 	if (nullptr != InputActionAttackRef.Object)
 	{
 		AttackAction = InputActionAttackRef.Object;
+
 	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSwapRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_SwapCharacter.IA_SwapCharacter'"));
+	if (nullptr != InputActionSwapRef.Object)
+	{
+		SwapAction = InputActionSwapRef.Object;
+
+	}
+
+
 
 	CurrentCharacterControlType = ECharacterControlType::Shoulder;
 
@@ -89,6 +99,7 @@ void AMHWereWolf::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	EnhancedInputComponent->BindAction(ShoulderLookAction, ETriggerEvent::Triggered, this, &AMHWereWolf::ShoulderLook);
 	EnhancedInputComponent->BindAction(QuaterMoveAction, ETriggerEvent::Triggered, this, &AMHWereWolf::QuaterMove);
 	EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AMHWereWolf::Attack);
+	EnhancedInputComponent->BindAction(SwapAction, ETriggerEvent::Triggered, this, &AMHWereWolf::SwapCharacter);
 
 }
 
@@ -193,4 +204,7 @@ void AMHWereWolf::QuaterMove(const FInputActionValue& Value)
 void AMHWereWolf::Attack()
 {
 	ProcessComboCommand();
+
+
+
 }

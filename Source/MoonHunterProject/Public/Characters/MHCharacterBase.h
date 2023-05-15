@@ -30,11 +30,29 @@ protected:
 	TMap<ECharacterControlType, class UMHCharacterControlData*> CharacterControlManager;
 
 
+//Swap Section
+protected:
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class USkeletalMeshComponent> WolfMesh; 
+
+	bool bIsWolf = false;
+
+	void SwapCharacter();
+
+	FORCEINLINE TObjectPtr<class USkeletalMeshComponent> GetCurrentMesh() {
+		return bIsWolf ? WolfMesh : GetMesh();
+	}
+
+
 //Combo Action Section
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> ComboActionMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> WolfComboActionMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UMHComboActionData> ComboActionData;
@@ -66,6 +84,10 @@ protected:
 	void PlayDeadAnimation();
 
 	float DeadEventDelayTime = 3.0f;
+
+
+
+
 
 
 };

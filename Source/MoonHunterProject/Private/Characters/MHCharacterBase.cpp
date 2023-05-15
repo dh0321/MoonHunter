@@ -37,7 +37,14 @@ AMHCharacterBase::AMHCharacterBase()
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
+	//WolfMesh
+	WolfMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WolfMesh"));
+	WolfMesh->SetupAttachment(GetCapsuleComponent());
+	WolfMesh->SetHiddenInGame(true);
+	WolfMesh->Deactivate();
 
+
+	//Person
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Game/Assets/FOX/Mesh/SK_fox.SK_fox"));
 	if (CharacterMeshRef.Object)
 	{
@@ -53,6 +60,22 @@ AMHCharacterBase::AMHCharacterBase()
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
 
+
+	//Wolf
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> WolfCharacterMeshRef(TEXT("/Game/Assets/Blink/NPCs/Stylized/Forest_Animals/Wolf/Meshes/SKM_Wolf.SKM_Wolf"));
+	if (WolfCharacterMeshRef.Object)
+	{
+		WolfMesh->SetSkeletalMesh(WolfCharacterMeshRef.Object);
+	}
+
+	static ConstructorHelpers::FClassFinder<UAnimInstance> WolfAnimInstanceClassRef(TEXT("/Game/Animations/ABP_Wolf.ABP_Wolf_C"));
+	if (WolfAnimInstanceClassRef.Class)
+	{
+		WolfMesh->SetAnimInstanceClass(WolfAnimInstanceClassRef.Class);
+	}
+
+
+	//Data
 	static ConstructorHelpers::FObjectFinder<UMHCharacterControlData> ShoulderDataRef(TEXT("/Game/CharacterControl/MHC_Shoulder.MHC_Shoulder"));
 	if (ShoulderDataRef.Object)
 	{
@@ -65,16 +88,18 @@ AMHCharacterBase::AMHCharacterBase()
 		CharacterControlManager.Add(ECharacterControlType::Quater, QuaterDataRef.Object);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> ComboActionMontageRef(TEXT("/Game/Animations/AM_PersonComboAttack.AM_PersonComboAttack"));
-	if (ComboActionMontageRef.Object)
-	{
-		ComboActionMontage = ComboActionMontageRef.Object;
-	}
-
 	static ConstructorHelpers::FObjectFinder<UMHComboActionData> ComboActionDataRef(TEXT("/Game/CharacterAction/MHA_ComboAttack.MHA_ComboAttack"));
 	if (ComboActionDataRef.Object)
 	{
 		ComboActionData = ComboActionDataRef.Object;
+	}
+
+
+	//Animations
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> ComboActionMontageRef(TEXT("/Game/Animations/AM_PersonComboAttack.AM_PersonComboAttack"));
+	if (ComboActionMontageRef.Object)
+	{
+		ComboActionMontage = ComboActionMontageRef.Object;
 	}
 	
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(TEXT("/Game/Animations/AM_Dead.AM_Dead"));
@@ -83,7 +108,12 @@ AMHCharacterBase::AMHCharacterBase()
 		DeadMontage = DeadMontageRef.Object;
 	}
 
-	
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> WolfComboActionMontageRef(TEXT("/Game/Animations/AM_WolfComboAttack.AM_WolfComboAttack"));
+	if (WolfComboActionMontageRef.Object)
+	{
+		WolfComboActionMontage = WolfComboActionMontageRef.Object;
+	}
+
 }
 
 void AMHCharacterBase::SetCharacterControlData(const UMHCharacterControlData* CharacterControlData)
@@ -127,12 +157,13 @@ void AMHCharacterBase::ComboActionBegin()
 
 	//Animation Setting
 	const float AttackSpeedRate = 1.0f;
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(ComboActionMontage, AttackSpeedRate);
+	UAnimInstance* AnimInstance = GetCurrentMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(bIsWolf ? WolfComboActionMontage : ComboActionMontage, AttackSpeedRate);
+
 
 	FOnMontageEnded EndDelegate;
 	EndDelegate.BindUObject(this, &AMHCharacterBase::ComboActionEnd);
-	AnimInstance->Montage_SetEndDelegate(EndDelegate, ComboActionMontage);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, bIsWolf ? WolfComboActionMontage : ComboActionMontage);
 
 	ComboTimerHandle.Invalidate();
 	SetComboCheckTimer();
@@ -167,7 +198,7 @@ void AMHCharacterBase::ComboCheck()
 	ComboTimerHandle.Invalidate();
 	if (HasNextComboCommand)
 	{
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		UAnimInstance* AnimInstance = GetCurrentMesh()->GetAnimInstance();
 
 		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, ComboActionData->MaxComboCount);
 		FName NextSection = *FString::Printf(TEXT("%s%d"), *ComboActionData->MontageSectionNamePrefix, CurrentCombo);
@@ -203,9 +234,7 @@ void AMHCharacterBase::AttackHitCheck()
 
 	DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 5.0f);
 
-
 #endif
-
 
 }
 
@@ -227,9 +256,30 @@ void AMHCharacterBase::SetDead()
 
 void AMHCharacterBase::PlayDeadAnimation()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	UAnimInstance* AnimInstance = GetCurrentMesh()->GetAnimInstance();
 	AnimInstance->StopAllMontages(0.0f);
 	AnimInstance->Montage_Play(DeadMontage, 1.0f);
+}
+
+void AMHCharacterBase::SwapCharacter()
+{
+	if (bIsWolf)
+	{
+		GetMesh()->Activate();
+		WolfMesh->Deactivate();
+		GetMesh()->SetHiddenInGame(false);
+		WolfMesh->SetHiddenInGame(true);
+	}
+	else
+	{
+		GetMesh()->Deactivate();
+		WolfMesh->Activate();
+		GetMesh()->SetHiddenInGame(true);
+		WolfMesh->SetHiddenInGame(false);
+	}
+
+	bIsWolf = !bIsWolf;
+
 }
 
 
