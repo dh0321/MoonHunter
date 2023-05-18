@@ -9,6 +9,9 @@
 #include "Characters/MHComboActionData.h"
 #include "Physics/MHCollision.h"
 #include "Engine/DamageEvents.h"
+#include "CharacterStat/MHCharacterStatComponent.h"
+#include "UI/MHWidgetComponent.h"
+#include "UI/MHHpBarWidget.h"
 
 
 AMHCharacterBase::AMHCharacterBase()
@@ -114,6 +117,31 @@ AMHCharacterBase::AMHCharacterBase()
 		WolfComboActionMontage = WolfComboActionMontageRef.Object;
 	}
 
+	//Stat Component
+	Stat = CreateDefaultSubobject<UMHCharacterStatComponent>(TEXT("Stat"));
+
+	//Widget Component
+	HpBar = CreateDefaultSubobject<UMHWidgetComponent>(TEXT("Widget"));
+	HpBar->SetupAttachment(GetMesh());
+	HpBar->SetRelativeLocation(FVector(0.0f, 0.0f, 220.0f));
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/UI/WBP_HpBar.WBP_HpBar_C"));
+	if (HpBarWidgetRef.Class)
+	{
+		HpBar->SetWidgetClass(HpBarWidgetRef.Class);
+		HpBar->SetWidgetSpace(EWidgetSpace::Screen);
+		HpBar->SetDrawSize(FVector2D(150.f, 15.0f));
+		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
+
+}
+
+void AMHCharacterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	Stat->OnHpZero.AddUObject(this, &AMHCharacterBase::SetDead);
 }
 
 void AMHCharacterBase::SetCharacterControlData(const UMHCharacterControlData* CharacterControlData)
@@ -242,7 +270,7 @@ float AMHCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	
-	SetDead();
+	Stat->ApplyDamage(DamageAmount);
 
 	return DamageAmount;
 }
@@ -252,6 +280,7 @@ void AMHCharacterBase::SetDead()
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	PlayDeadAnimation();
 	SetActorEnableCollision(false);
+	HpBar->SetHiddenInGame(true);
 }
 
 void AMHCharacterBase::PlayDeadAnimation()
@@ -259,6 +288,17 @@ void AMHCharacterBase::PlayDeadAnimation()
 	UAnimInstance* AnimInstance = GetCurrentMesh()->GetAnimInstance();
 	AnimInstance->StopAllMontages(0.0f);
 	AnimInstance->Montage_Play(DeadMontage, 1.0f);
+}
+
+void AMHCharacterBase::SetupCharacterWidget(UMHUserWidget* InUserWidget)
+{
+	UMHHpBarWidget* HpBarWidget = Cast<UMHHpBarWidget>(InUserWidget);
+	if (HpBarWidget)
+	{
+		HpBarWidget->SetMaxHp(Stat->GetMaxUp());
+		HpBarWidget->UpdateHpBar(Stat->GetCurrentHp());
+		Stat->OnHpChanged.AddUObject(HpBarWidget, &UMHHpBarWidget::UpdateHpBar);
+	}
 }
 
 void AMHCharacterBase::SwapCharacter()
@@ -269,6 +309,7 @@ void AMHCharacterBase::SwapCharacter()
 		WolfMesh->Deactivate();
 		GetMesh()->SetHiddenInGame(false);
 		WolfMesh->SetHiddenInGame(true);
+
 	}
 	else
 	{
@@ -276,10 +317,10 @@ void AMHCharacterBase::SwapCharacter()
 		WolfMesh->Activate();
 		GetMesh()->SetHiddenInGame(true);
 		WolfMesh->SetHiddenInGame(false);
+
 	}
 
 	bIsWolf = !bIsWolf;
-
 }
 
 

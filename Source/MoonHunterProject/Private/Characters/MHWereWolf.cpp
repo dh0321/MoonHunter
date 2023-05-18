@@ -65,14 +65,12 @@ AMHWereWolf::AMHWereWolf()
 
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSwapRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_SwapCharacter.IA_SwapCharacter'"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionSwapRef(TEXT("/Game/Input/Actions/IA_SwapCharacter.IA_SwapCharacter"));
 	if (nullptr != InputActionSwapRef.Object)
 	{
 		SwapAction = InputActionSwapRef.Object;
 
 	}
-
-
 
 	CurrentCharacterControlType = ECharacterControlType::Shoulder;
 
@@ -204,7 +202,5 @@ void AMHWereWolf::QuaterMove(const FInputActionValue& Value)
 void AMHWereWolf::Attack()
 {
 	ProcessComboCommand();
-
-
 
 }

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interface/MHAnimationAttackInterface.h"
+#include "Interface/MHCharacterWidgetInterface.h"
 #include "MHCharacterBase.generated.h"
 
 UENUM()
@@ -16,19 +17,14 @@ enum class ECharacterControlType : uint8
 
 
 UCLASS()
-class MOONHUNTERPROJECT_API AMHCharacterBase : public ACharacter, public IMHAnimationAttackInterface
+class MOONHUNTERPROJECT_API AMHCharacterBase : public ACharacter, public IMHAnimationAttackInterface, public IMHCharacterWidgetInterface
 {
 	GENERATED_BODY()
 
 public:
 	AMHCharacterBase();
 
-protected:
-	virtual void SetCharacterControlData(const class UMHCharacterControlData* CharacterControlData);
-
-	UPROPERTY(EditAnywhere, Category = CharacterControl, Meta = (AllowPrivateAccess = "true"))
-	TMap<ECharacterControlType, class UMHCharacterControlData*> CharacterControlManager;
-
+	virtual void PostInitializeComponents() override;
 
 //Swap Section
 protected:
@@ -40,9 +36,18 @@ protected:
 
 	void SwapCharacter();
 
-	FORCEINLINE TObjectPtr<class USkeletalMeshComponent> GetCurrentMesh() {
+	FORCEINLINE TObjectPtr<class USkeletalMeshComponent> GetCurrentMesh() 
+	{
 		return bIsWolf ? WolfMesh : GetMesh();
 	}
+
+
+protected:
+	virtual void SetCharacterControlData(const class UMHCharacterControlData* CharacterControlData);
+
+	UPROPERTY(EditAnywhere, Category = CharacterControl, Meta = (AllowPrivateAccess = "true"))
+	TMap<ECharacterControlType, class UMHCharacterControlData*> CharacterControlManager;
+
 
 
 //Combo Action Section
@@ -86,8 +91,18 @@ protected:
 	float DeadEventDelayTime = 3.0f;
 
 
+//Stat Section
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UMHCharacterStatComponent> Stat;	
 
 
+//UI Widget Section
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UMHWidgetComponent> HpBar;
+
+	virtual void SetupCharacterWidget(UMHUserWidget* InUserWidget);
 
 
 };
