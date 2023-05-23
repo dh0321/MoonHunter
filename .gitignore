@@ -76,13 +76,21 @@ DerivedDataCache/*
 # Assets from EpicGames
 # Content/Assets/[ASSET NAME]/*
 # !Content/Assets/[ASSET NAME]/.gitkeep
+Content/Assests/AdventureLootPack/*
+!Content/Assets/AdventureLootPack/.gitkeep
 Content/Assests/AnimalVarietyPack/*
 !Content/Assets/AnimalVarietyPack/.gitkeep
-Content/Assests/Scanned3DPeoplePack/*
-!Content/Assets/Scanned3DPeoplePack/.gitkeep
 Content/Assests/Animations/*
 !Content/Assets/Animations/.gitkeep
-Content/Assests/FOX/*
-!Content/Assets/FOX/.gitkeep
 Content/Assests/Blink/*
 !Content/Assets/Blink/.gitkeep
+Content/Assests/FOX/*
+!Content/Assets/FOX/.gitkeep
+Content/Assests/sA_PickupSet_1/*
+!Content/Assets/sA_PickupSet_1/.gitkeep
+Content/Assests/Scanned3DPeoplePack/*
+!Content/Assets/Scanned3DPeoplePack/.gitkeep
+Content/Assests/UniqueIconsPack/*
+!Content/Assets/UniqueIconsPack/.gitkeep
+Content/KTP_Effect/*
+!Content/KTP_Effect/.gitkeep
