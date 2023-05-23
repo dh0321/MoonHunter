@@ -12,6 +12,8 @@
 #include "CharacterStat/MHCharacterStatComponent.h"
 #include "UI/MHWidgetComponent.h"
 #include "UI/MHHpBarWidget.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 
 
 AMHCharacterBase::AMHCharacterBase()
@@ -46,7 +48,7 @@ AMHCharacterBase::AMHCharacterBase()
 	WolfMesh->SetHiddenInGame(true);
 	WolfMesh->Deactivate();
 
-
+	
 	//Person
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Game/Assets/FOX/Mesh/SK_fox.SK_fox"));
 	if (CharacterMeshRef.Object)
@@ -134,6 +136,16 @@ AMHCharacterBase::AMHCharacterBase()
 		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
+	//Niagara Effect
+	ChangeEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ChangeEffect"));
+	ChangeEffect->SetupAttachment(GetCapsuleComponent());
+	ChangeEffect->bAutoActivate = false;
+
+	/*static ConstructorHelpers::FObjectFinder<UNiagaraComponent> ChangeEffectRef(TEXT("/Game/KTP_Effect/Particles/Bottom/Bottom20-02.Bottom20-02"));
+	if (ChangeEffectRef.Object)
+	{
+		ChangeEffect = ChangeEffectRef.Object;
+	}*/
 
 }
 
@@ -303,6 +315,8 @@ void AMHCharacterBase::SetupCharacterWidget(UMHUserWidget* InUserWidget)
 
 void AMHCharacterBase::SwapCharacter()
 {
+	ChangeEffect->Activate(true);
+
 	if (bIsWolf)
 	{
 		GetMesh()->Activate();

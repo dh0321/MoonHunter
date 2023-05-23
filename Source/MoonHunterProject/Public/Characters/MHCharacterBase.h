@@ -32,6 +32,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class USkeletalMeshComponent> WolfMesh; 
 
+	UPROPERTY(VisibleAnywhere, Category = Effect)
+	TObjectPtr<class UNiagaraComponent> ChangeEffect;
+
 	bool bIsWolf = false;
 
 	void SwapCharacter();
