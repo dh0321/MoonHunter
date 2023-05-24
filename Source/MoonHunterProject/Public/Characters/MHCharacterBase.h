@@ -6,7 +6,10 @@
 #include "GameFramework/Character.h"
 #include "Interface/MHAnimationAttackInterface.h"
 #include "Interface/MHCharacterWidgetInterface.h"
+#include "Interface/MHCharacterItemInterface.h"
 #include "MHCharacterBase.generated.h"
+
+DECLARE_LOG_CATEGORY_EXTERN(LogMHCharacter, Log, All);
 
 UENUM()
 enum class ECharacterControlType : uint8
@@ -15,9 +18,19 @@ enum class ECharacterControlType : uint8
 	Quater
 };
 
+DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, class UMHItemData* /*InItemData*/);
+USTRUCT(BlueprintType)
+struct FTakeItemDelegateWrapper
+{
+	GENERATED_BODY()
+	FTakeItemDelegateWrapper() {}
+	FTakeItemDelegateWrapper(const FOnTakeItemDelegate& InItemDelegate) : ItemDelegate(InItemDelegate) {}
+	FOnTakeItemDelegate ItemDelegate;
+};
+
 
 UCLASS()
-class MOONHUNTERPROJECT_API AMHCharacterBase : public ACharacter, public IMHAnimationAttackInterface, public IMHCharacterWidgetInterface
+class MOONHUNTERPROJECT_API AMHCharacterBase : public ACharacter, public IMHAnimationAttackInterface, public IMHCharacterWidgetInterface, public IMHCharacterItemInterface
 {
 	GENERATED_BODY()
 
@@ -106,6 +119,17 @@ protected:
 	TObjectPtr<class UMHWidgetComponent> HpBar;
 
 	virtual void SetupCharacterWidget(UMHUserWidget* InUserWidget);
+
+
+//Item Section
+protected:
+	UPROPERTY()
+	TArray<FTakeItemDelegateWrapper> TakeItemActions;	
+
+	virtual void TakeItem(class UMHItemData* InItemData) override;
+	virtual void EquipWeapon(class UMHItemData* InItemData);
+	virtual void DrinkPotion(class UMHItemData* InItemData);
+	virtual void ReadScroll(class UMHItemData* InItemData);
 
 
 };

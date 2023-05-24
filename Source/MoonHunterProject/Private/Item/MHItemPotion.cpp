@@ -8,6 +8,7 @@
 #include "Physics/MHCollision.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
+#include "Interface/MHCharacterItemInterface.h"
 
 
 AMHItemPotion::AMHItemPotion()
@@ -34,6 +35,18 @@ AMHItemPotion::AMHItemPotion()
 
 void AMHItemPotion::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (nullptr == Item)
+	{
+		Destroy();
+		return;
+	}
+
+	IMHCharacterItemInterface* OverlappingPawn = Cast<IMHCharacterItemInterface>(OtherActor);
+	if (OverlappingPawn)
+	{
+		OverlappingPawn->TakeItem(Item);
+	}
+
 	Effect->Activate(true);
 	Mesh->SetHiddenInGame(true);
 	SetActorEnableCollision(false);

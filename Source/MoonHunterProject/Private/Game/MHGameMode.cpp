@@ -6,7 +6,7 @@
 AMHGameMode::AMHGameMode()
 {
 
-	static ConstructorHelpers::FClassFinder<APawn> DefaultPawnClassRef(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/BP_WereWolf.BP_WereWolf_C'"));
+	static ConstructorHelpers::FClassFinder<APawn> DefaultPawnClassRef(TEXT("/Script/Engine.Blueprint'/Game/Blueprints/Character/BP_WereWolf.BP_WereWolf_C'"));
 	if (DefaultPawnClassRef.Class)
 	{
 		DefaultPawnClass = DefaultPawnClassRef.Class;

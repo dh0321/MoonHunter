@@ -14,7 +14,9 @@
 #include "UI/MHHpBarWidget.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
+#include "Item/MHWeaponItemData.h"
 
+DEFINE_LOG_CATEGORY(LogMHCharacter);
 
 AMHCharacterBase::AMHCharacterBase()
 {
@@ -141,11 +143,10 @@ AMHCharacterBase::AMHCharacterBase()
 	ChangeEffect->SetupAttachment(GetCapsuleComponent());
 	ChangeEffect->bAutoActivate = false;
 
-	/*static ConstructorHelpers::FObjectFinder<UNiagaraComponent> ChangeEffectRef(TEXT("/Game/KTP_Effect/Particles/Bottom/Bottom20-02.Bottom20-02"));
-	if (ChangeEffectRef.Object)
-	{
-		ChangeEffect = ChangeEffectRef.Object;
-	}*/
+	//Item Actions
+	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AMHCharacterBase::EquipWeapon)));
+	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AMHCharacterBase::DrinkPotion)));
+	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AMHCharacterBase::ReadScroll)));
 
 }
 
@@ -166,6 +167,30 @@ void AMHCharacterBase::SetCharacterControlData(const UMHCharacterControlData* Ch
 	GetCharacterMovement()->bUseControllerDesiredRotation = CharacterControlData->bUseControllerDesiredRotation;
 	GetCharacterMovement()->RotationRate = CharacterControlData->RotationRate;
 
+}
+
+void AMHCharacterBase::SwapCharacter()
+{
+	ChangeEffect->Activate(true);
+
+	if (bIsWolf)
+	{
+		GetMesh()->Activate();
+		WolfMesh->Deactivate();
+		GetMesh()->SetHiddenInGame(false);
+		WolfMesh->SetHiddenInGame(true);
+
+	}
+	else
+	{
+		GetMesh()->Deactivate();
+		WolfMesh->Activate();
+		GetMesh()->SetHiddenInGame(true);
+		WolfMesh->SetHiddenInGame(false);
+
+	}
+
+	bIsWolf = !bIsWolf;
 }
 
 void AMHCharacterBase::ProcessComboCommand()
@@ -313,28 +338,28 @@ void AMHCharacterBase::SetupCharacterWidget(UMHUserWidget* InUserWidget)
 	}
 }
 
-void AMHCharacterBase::SwapCharacter()
+void AMHCharacterBase::TakeItem(UMHItemData* InItemData)
 {
-	ChangeEffect->Activate(true);
-
-	if (bIsWolf)
+	if (InItemData)
 	{
-		GetMesh()->Activate();
-		WolfMesh->Deactivate();
-		GetMesh()->SetHiddenInGame(false);
-		WolfMesh->SetHiddenInGame(true);
-
+		TakeItemActions[(uint8)InItemData->Type].ItemDelegate.ExecuteIfBound(InItemData);
 	}
-	else
-	{
-		GetMesh()->Deactivate();
-		WolfMesh->Activate();
-		GetMesh()->SetHiddenInGame(true);
-		WolfMesh->SetHiddenInGame(false);
-
-	}
-
-	bIsWolf = !bIsWolf;
 }
+
+void AMHCharacterBase::EquipWeapon(UMHItemData* InItemData)
+{
+	UE_LOG(LogMHCharacter, Log, TEXT("Have Weapon"));
+}
+
+void AMHCharacterBase::DrinkPotion(UMHItemData* InItemData)
+{
+	UE_LOG(LogMHCharacter, Log, TEXT("Drink Potion"));
+}
+
+void AMHCharacterBase::ReadScroll(UMHItemData* InItemData)
+{
+	UE_LOG(LogMHCharacter, Log, TEXT("Read Scroll"));
+}
+
 
 
