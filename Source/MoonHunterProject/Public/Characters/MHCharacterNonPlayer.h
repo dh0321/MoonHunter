@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Characters/MHCharacterBase.h"
+#include "Interface/MHCharacterAIInterface.h"
 #include "MHCharacterNonPlayer.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MOONHUNTERPROJECT_API AMHCharacterNonPlayer : public AMHCharacterBase
+class MOONHUNTERPROJECT_API AMHCharacterNonPlayer : public AMHCharacterBase, public IMHCharacterAIInterface
 {
 	GENERATED_BODY()
 	
@@ -19,5 +20,13 @@ public:
 
 protected:
 	void SetDead() override;
+
+
+//AI Section
+protected:
+	virtual float GetAIPatrolRadius() override;
+	virtual float GetAIDetectRange() override;
+	virtual float GetAIAttackRange() override;
+	virtual float GetAITurnSpeed() override;
 	
 };

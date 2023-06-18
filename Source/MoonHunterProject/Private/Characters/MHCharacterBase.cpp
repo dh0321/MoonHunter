@@ -179,6 +179,7 @@ void AMHCharacterBase::SwapCharacter()
 		WolfMesh->Deactivate();
 		GetMesh()->SetHiddenInGame(false);
 		WolfMesh->SetHiddenInGame(true);
+		GetCharacterMovement()->MaxWalkSpeed = 500.f;
 
 	}
 	else
@@ -187,6 +188,7 @@ void AMHCharacterBase::SwapCharacter()
 		WolfMesh->Activate();
 		GetMesh()->SetHiddenInGame(true);
 		WolfMesh->SetHiddenInGame(false);
+		GetCharacterMovement()->MaxWalkSpeed = 650.f;
 
 	}
 
@@ -279,7 +281,7 @@ void AMHCharacterBase::AttackHitCheck()
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
 
 	const float AttackRange = 40.0f;
-	const float AttackRadius = 50.0f;
+	const float AttackRadius = Stat->GetAttackRadius();
 	const float AttackDamage = 30.0f;
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;

@@ -7,6 +7,7 @@ UMHCharacterStatComponent::UMHCharacterStatComponent()
 {
 	MaxHp = 200.f;
 	CurrentHp = MaxHp;
+	AttackRadius = 50.0f;
 }
 
 

@@ -27,6 +27,8 @@ public:
 
 	FORCEINLINE float GetMaxUp() { return MaxHp; }
 	FORCEINLINE float GetCurrentHp() { return CurrentHp; }
+	//FORCEINLINE FMHCharacterStat GetTotalStat() const { return BaseStat + ModifierStat; }
+	FORCEINLINE float GetAttackRadius() const { return AttackRadius; }
 	float ApplyDamage(float InDamage);
 
 
@@ -39,6 +41,9 @@ protected:
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
 	float CurrentHp;
+
+	UPROPERTY(VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	float AttackRadius;
 
 		
 };
