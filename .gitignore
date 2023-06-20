@@ -86,6 +86,8 @@ Content/Assests/Blink/*
 !Content/Assets/Blink/.gitkeep
 Content/Assests/FOX/*
 !Content/Assets/FOX/.gitkeep
+Content/Assests/InfinityBladeWeapons/*
+!Content/Assets/InfinityBladeWeapons/.gitkeep
 Content/Assests/sA_PickupSet_1/*
 !Content/Assets/sA_PickupSet_1/.gitkeep
 Content/Assests/Scanned3DPeoplePack/*

@@ -148,6 +148,10 @@ AMHCharacterBase::AMHCharacterBase()
 	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AMHCharacterBase::DrinkPotion)));
 	TakeItemActions.Add(FTakeItemDelegateWrapper(FOnTakeItemDelegate::CreateUObject(this, &AMHCharacterBase::ReadScroll)));
 
+	//Weapon Component
+	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	Weapon->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
+
 }
 
 void AMHCharacterBase::PostInitializeComponents()
@@ -351,6 +355,18 @@ void AMHCharacterBase::TakeItem(UMHItemData* InItemData)
 void AMHCharacterBase::EquipWeapon(UMHItemData* InItemData)
 {
 	UE_LOG(LogMHCharacter, Log, TEXT("Have Weapon"));
+
+	UMHWeaponItemData* WeaponItemData = Cast<UMHWeaponItemData>(InItemData);
+
+	if (WeaponItemData)
+	{
+		if (WeaponItemData->WeaponMesh.IsPending())
+		{
+			WeaponItemData->WeaponMesh.LoadSynchronous();
+		}
+		Weapon->SetSkeletalMesh(WeaponItemData->WeaponMesh.Get());
+	}
+
 }
 
 void AMHCharacterBase::DrinkPotion(UMHItemData* InItemData)

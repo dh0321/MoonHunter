@@ -16,7 +16,7 @@ class MOONHUNTERPROJECT_API UMHWeaponItemData : public UMHItemData
 	
 public:
 	UPROPERTY(EditAnywhere, Category = Weapon)
-	TObjectPtr<class USkeletalMesh> WeaponMesh;
+	TSoftObjectPtr<class USkeletalMesh> WeaponMesh;
 	
 	
 	
