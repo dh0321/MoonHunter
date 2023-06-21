@@ -2,11 +2,11 @@
 
 
 #include "CharacterStat/MHCharacterStatComponent.h"
+#include "GameData/MHGameSingleton.h"
 
 UMHCharacterStatComponent::UMHCharacterStatComponent()
 {
-	MaxHp = 200.f;
-	CurrentHp = MaxHp;
+	CurrentLevel = 1;
 	AttackRadius = 50.0f;
 }
 
@@ -15,8 +15,16 @@ void UMHCharacterStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetHp(MaxHp);
+	SetLevelStat(CurrentLevel);
+	SetHp(BaseStat.MaxHp);
 	
+}
+
+void UMHCharacterStatComponent::SetLevelStat(int32 InNewLevel)
+{
+	CurrentLevel = FMath::Clamp(InNewLevel, 1, UMHGameSingleton::Get().CharacterMaxLevel);
+	BaseStat = UMHGameSingleton::Get().GetCharacterStat(CurrentLevel);
+	check(BaseStat.MaxHp > 0.0f);
 }
 
 float UMHCharacterStatComponent::ApplyDamage(float InDamage)
@@ -35,7 +43,7 @@ float UMHCharacterStatComponent::ApplyDamage(float InDamage)
 
 void UMHCharacterStatComponent::SetHp(float NewHp)
 {
-	CurrentHp = FMath::Clamp<float>(NewHp, 0.0f, MaxHp);
+	CurrentHp = FMath::Clamp<float>(NewHp, 0.0f, BaseStat.MaxHp);
 
 	OnHpChanged.Broadcast(CurrentHp);
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameData/MHCharacterStat.h"
 #include "MHCharacterStatComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnHpZeroDelegate);
@@ -25,9 +26,11 @@ public:
 	FOnHpZeroDelegate OnHpZero;
 	FOnHpChangedDelegate OnHpChanged;
 
-	FORCEINLINE float GetMaxUp() { return MaxHp; }
-	FORCEINLINE float GetCurrentHp() { return CurrentHp; }
-	//FORCEINLINE FMHCharacterStat GetTotalStat() const { return BaseStat + ModifierStat; }
+	void SetLevelStat(int32 InNewLevel);
+	FORCEINLINE float GetCurrentLevel() const { return CurrentLevel; }
+	FORCEINLINE void SetModifierStat(const FMHCharacterStat& InModifierStat) { ModifierStat = InModifierStat; }
+	FORCEINLINE FMHCharacterStat GetTotalStat() const { return BaseStat + ModifierStat; }
+	FORCEINLINE float GetCurrentHp() const { return CurrentHp; }
 	FORCEINLINE float GetAttackRadius() const { return AttackRadius; }
 	float ApplyDamage(float InDamage);
 
@@ -36,14 +39,20 @@ public:
 protected:
 	void SetHp(float NewHp);
 
-	UPROPERTY(VisibleInstanceOnly, Category = Stat)
-	float MaxHp;
-
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
 	float CurrentHp;
 
+	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
+	float CurrentLevel;
+
+	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	FMHCharacterStat BaseStat;
+
+	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	FMHCharacterStat ModifierStat;
+	
 	UPROPERTY(VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
 	float AttackRadius;
-
-		
+	
+	
 };
