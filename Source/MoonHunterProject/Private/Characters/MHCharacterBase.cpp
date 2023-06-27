@@ -247,6 +247,11 @@ void AMHCharacterBase::ComboActionEnd(UAnimMontage* TargetMontage, bool IsProper
 	CurrentCombo = 0;
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 
+	NotifyComboActionEnd();
+}
+
+void AMHCharacterBase::NotifyComboActionEnd()
+{
 }
 
 void AMHCharacterBase::SetComboCheckTimer()

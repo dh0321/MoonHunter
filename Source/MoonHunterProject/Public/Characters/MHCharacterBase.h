@@ -82,6 +82,7 @@ protected:
 
 	void ComboActionBegin(); //몽타주가 시작될 때 호출
 	void ComboActionEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded); //몽타주가 모두 종료되었을 때 호출
+	virtual void NotifyComboActionEnd();
 	void SetComboCheckTimer();
 	void ComboCheck();
 

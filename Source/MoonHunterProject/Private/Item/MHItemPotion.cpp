@@ -48,7 +48,7 @@ void AMHItemPotion::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAc
 	}
 
 	Effect->Activate(true);
-	Mesh->SetHiddenInGame(true);
+	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
 	//Effect->OnSystemFinished.AddDynamic(this, &AMHItemPotion::OnEffectFinished);
 }

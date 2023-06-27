@@ -38,10 +38,26 @@ float AMHCharacterNonPlayer::GetAIDetectRange()
 
 float AMHCharacterNonPlayer::GetAIAttackRange()
 {
-	return Stat->GetAttackRadius() * 2;
+	return Stat->GetTotalStat().AttackRange + Stat->GetAttackRadius() * 2;
 }
 
 float AMHCharacterNonPlayer::GetAITurnSpeed()
 {
-	return 0.0f;
+	return 2.0f;
+}
+
+void AMHCharacterNonPlayer::SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished)
+{
+	OnAttackFinished = InOnAttackFinished;
+}
+
+void AMHCharacterNonPlayer::AttackByAI()
+{
+	ProcessComboCommand();
+}
+
+void AMHCharacterNonPlayer::NotifyComboActionEnd()
+{
+	Super::NotifyComboActionEnd();
+	OnAttackFinished.ExecuteIfBound();
 }
