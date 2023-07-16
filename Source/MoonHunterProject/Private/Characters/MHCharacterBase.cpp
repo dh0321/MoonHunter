@@ -61,7 +61,7 @@ AMHCharacterBase::AMHCharacterBase()
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
 	}
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Animations/ABP_Person.ABP_Person_C"));
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Animations/AnimBlueprints/ABP_Person.ABP_Person_C"));
 	if (AnimInstanceClassRef.Class)
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
@@ -69,13 +69,13 @@ AMHCharacterBase::AMHCharacterBase()
 
 
 	//Wolf
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> WolfCharacterMeshRef(TEXT("/Game/Assets/Blink/NPCs/Stylized/Forest_Animals/Wolf/Meshes/SKM_Wolf.SKM_Wolf"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> WolfCharacterMeshRef(TEXT("/Game/Assets/Cats_pack/Cats/SimpleCat/Meshes/Mesh_Cat_Simple.Mesh_Cat_Simple"));
 	if (WolfCharacterMeshRef.Object)
 	{
 		WolfMesh->SetSkeletalMesh(WolfCharacterMeshRef.Object);
 	}
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> WolfAnimInstanceClassRef(TEXT("/Game/Animations/ABP_Wolf.ABP_Wolf_C"));
+	static ConstructorHelpers::FClassFinder<UAnimInstance> WolfAnimInstanceClassRef(TEXT("/Game/Animations/AnimBlueprints/ABP_CatSimple_2.ABP_CatSimple_2_C"));
 	if (WolfAnimInstanceClassRef.Class)
 	{
 		WolfMesh->SetAnimInstanceClass(WolfAnimInstanceClassRef.Class);
@@ -103,23 +103,30 @@ AMHCharacterBase::AMHCharacterBase()
 
 
 	//Animations
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> ComboActionMontageRef(TEXT("/Game/Animations/AM_PersonComboAttack.AM_PersonComboAttack"));
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> ComboActionMontageRef(TEXT("/Game/Animations/AnimMontage/AM_PersonComboAttack.AM_PersonComboAttack"));
 	if (ComboActionMontageRef.Object)
 	{
 		ComboActionMontage = ComboActionMontageRef.Object;
 	}
 	
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(TEXT("/Game/Animations/AM_Dead.AM_Dead"));
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(TEXT("/Game/Animations/AnimMontage/AM_Dead.AM_Dead"));
 	if (DeadMontageRef.Object)
 	{
 		DeadMontage = DeadMontageRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> WolfComboActionMontageRef(TEXT("/Game/Animations/AM_WolfComboAttack.AM_WolfComboAttack"));
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> WolfComboActionMontageRef(TEXT("/Game/Animations/AnimMontage/AM_CatSimpleComboAttack.AM_CatSimpleComboAttack"));
 	if (WolfComboActionMontageRef.Object)
 	{
 		WolfComboActionMontage = WolfComboActionMontageRef.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> WolfDeadMontageRef(TEXT("/Game/Animations/AnimMontage/AM_CatSimpleDead.AM_CatSimpleDead"));
+	if (WolfDeadMontageRef.Object)
+	{
+		WolfDeadMontage = WolfDeadMontageRef.Object;
+	}
+
 
 	//Stat Component
 	Stat = CreateDefaultSubobject<UMHCharacterStatComponent>(TEXT("Stat"));
@@ -183,8 +190,9 @@ void AMHCharacterBase::SwapCharacter()
 		WolfMesh->Deactivate();
 		GetMesh()->SetHiddenInGame(false);
 		WolfMesh->SetHiddenInGame(true);
-		GetCharacterMovement()->MaxWalkSpeed = 500.f;
-
+		GetCharacterMovement()->MaxWalkSpeed = 650.f;
+		GetCharacterMovement()->JumpZVelocity = 700.f;
+		GetCharacterMovement()->AirControl = 0.35f;
 	}
 	else
 	{
@@ -193,7 +201,8 @@ void AMHCharacterBase::SwapCharacter()
 		GetMesh()->SetHiddenInGame(true);
 		WolfMesh->SetHiddenInGame(false);
 		GetCharacterMovement()->MaxWalkSpeed = 650.f;
-
+		GetCharacterMovement()->JumpZVelocity = 490.f;
+		GetCharacterMovement()->AirControl = 0.35f;
 	}
 
 	bIsWolf = !bIsWolf;
@@ -335,7 +344,8 @@ void AMHCharacterBase::PlayDeadAnimation()
 {
 	UAnimInstance* AnimInstance = GetCurrentMesh()->GetAnimInstance();
 	AnimInstance->StopAllMontages(0.0f);
-	AnimInstance->Montage_Play(DeadMontage, 1.0f);
+	AnimInstance->Montage_Play(bIsWolf ? WolfDeadMontage : DeadMontage, 1.0f);
+
 }
 
 void AMHCharacterBase::SetupCharacterWidget(UMHUserWidget* InUserWidget)
