@@ -92,6 +92,8 @@ Content/Assests/InfinityBladeWeapons/*
 !Content/Assets/InfinityBladeWeapons/.gitkeep
 Content/Assests/medieval-castle/*
 !Content/Assets/medieval-castle/.gitkeep
+Content/Assests/PN_IvyPack/*
+!Content/Assets/PN_IvyPack/.gitkeep
 Content/Assests/sA_PickupSet_1/*
 !Content/Assets/sA_PickupSet_1/.gitkeep
 Content/Assests/Stylized_Forest/*
