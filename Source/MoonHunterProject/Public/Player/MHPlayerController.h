@@ -14,7 +14,21 @@ class MOONHUNTERPROJECT_API AMHPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
+public:
+	AMHPlayerController();
+
+	
 protected:
 	virtual void BeginPlay() override;
+
+
+//HUD Section
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HUD)
+	TSubclassOf<class UMHHUDWidget> MHHUDWidgetClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HUD)
+	TObjectPtr<class UMHHUDWidget> MHHUDWidget;
+
 
 };

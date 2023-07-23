@@ -9,7 +9,7 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnHpZeroDelegate);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHpChangedDelegate, float /*CurrentHp*/);
-
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnStatChangedDelegate, const FMHCharacterStat& /*BaseStat*/, const FMHCharacterStat& /*ModifierStat*/);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MOONHUNTERPROJECT_API UMHCharacterStatComponent : public UActorComponent
@@ -20,17 +20,23 @@ public:
 	UMHCharacterStatComponent();
 
 protected:
-	virtual void BeginPlay() override;
+	virtual void InitializeComponent() override;
 
 public:
 	FOnHpZeroDelegate OnHpZero;
 	FOnHpChangedDelegate OnHpChanged;
+	FOnStatChangedDelegate OnStatChanged;
 
 	void SetLevelStat(int32 InNewLevel);
 	FORCEINLINE float GetCurrentLevel() const { return CurrentLevel; }
-	FORCEINLINE void SetModifierStat(const FMHCharacterStat& InModifierStat) { ModifierStat = InModifierStat; }
+	FORCEINLINE void SetBaseStat(const FMHCharacterStat& InBaseStat) { BaseStat = InBaseStat; OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat()); }
+	FORCEINLINE void SetModifierStat(const FMHCharacterStat& InModifierStat) { ModifierStat = InModifierStat; OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat()); }
+	
+	FORCEINLINE const FMHCharacterStat& GetBaseStat() const { return BaseStat; }
+	FORCEINLINE const FMHCharacterStat& GetModifierStat() const { return ModifierStat; }	
 	FORCEINLINE FMHCharacterStat GetTotalStat() const { return BaseStat + ModifierStat; }
 	FORCEINLINE float GetCurrentHp() const { return CurrentHp; }
+	FORCEINLINE void HealHp(float InHealAmount) { CurrentHp = FMath::Clamp(CurrentHp + InHealAmount, 0, GetTotalStat().MaxHp); OnHpChanged.Broadcast(CurrentHp); }
 	FORCEINLINE float GetAttackRadius() const { return AttackRadius; }
 	float ApplyDamage(float InDamage);
 

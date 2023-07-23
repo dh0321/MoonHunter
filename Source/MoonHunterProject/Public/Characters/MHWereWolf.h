@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Characters/MHCharacterBase.h"
 #include "InputActionValue.h"
+#include "Interface/MHCharacterHUDInterface.h"
 #include "MHWereWolf.generated.h"
 
 
@@ -12,7 +13,7 @@
  * 
  */
 UCLASS()
-class MOONHUNTERPROJECT_API AMHWereWolf : public AMHCharacterBase
+class MOONHUNTERPROJECT_API AMHWereWolf : public AMHCharacterBase, public IMHCharacterHUDInterface
 {
 	GENERATED_BODY()
 
@@ -21,6 +22,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void SetDead() override;
 
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -72,5 +74,10 @@ protected:
 	void Attack();
 
 	ECharacterControlType CurrentCharacterControlType;
+
+
+protected:
+	virtual void SetupHUDWidget(class UMHHUDWidget* InHUDWidget) override;
+
 
 };

@@ -3,3 +3,7 @@
 
 #include "Item/MHWeaponItemData.h"
 
+UMHWeaponItemData::UMHWeaponItemData()
+{
+	Type = EItemType::Weapon;
+}

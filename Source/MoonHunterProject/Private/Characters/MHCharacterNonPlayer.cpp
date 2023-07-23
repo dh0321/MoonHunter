@@ -16,6 +16,13 @@ void AMHCharacterNonPlayer::SetDead()
 {
 	Super::SetDead();
 
+	AMHAIController* MHAIController = Cast<AMHAIController>(GetController());
+	if (MHAIController)
+	{
+		MHAIController->StopAI();
+	}
+
+
 	FTimerHandle DeadTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda(
 		[&]()

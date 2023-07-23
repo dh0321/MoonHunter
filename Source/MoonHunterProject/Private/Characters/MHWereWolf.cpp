@@ -8,6 +8,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Characters/MHCharacterControlData.h"
+#include "UI/MHHUDWidget.h"
+#include "CharacterStat/MHCharacterStatComponent.h"
 
 AMHWereWolf::AMHWereWolf()
 {
@@ -80,7 +82,25 @@ void AMHWereWolf::BeginPlay()
 {
 	Super::BeginPlay();
 
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		EnableInput(PlayerController);
+	}
+
 	SetCharacterControl(CurrentCharacterControlType);
+
+}
+
+void AMHWereWolf::SetDead()
+{
+	Super::SetDead();
+
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		DisableInput(PlayerController);
+	}
 
 }
 
@@ -202,5 +222,19 @@ void AMHWereWolf::QuaterMove(const FInputActionValue& Value)
 void AMHWereWolf::Attack()
 {
 	ProcessComboCommand();
+
+}
+
+void AMHWereWolf::SetupHUDWidget(UMHHUDWidget* InHUDWidget)
+{
+	if (InHUDWidget)
+	{
+		InHUDWidget->UpdateStat(Stat->GetBaseStat(), Stat->GetModifierStat());
+		InHUDWidget->UpdateHpBar(Stat->GetCurrentHp());
+	
+		Stat->OnStatChanged.AddUObject(InHUDWidget, &UMHHUDWidget::UpdateStat);
+		Stat->OnHpChanged.AddUObject(InHUDWidget, &UMHHUDWidget::UpdateHpBar);
+
+	}
 
 }

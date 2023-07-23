@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "MHUserWidget.h"
+#include "GameData/MHCharacterStat.h"
 #include "MHHpBarWidget.generated.h"
 
 /**
@@ -22,14 +23,21 @@ protected:
 	virtual void NativeConstruct() override;
 
 public:
-
-	FORCEINLINE void SetMaxHp(float NewMaxHp) { MaxHp = NewMaxHp; }
+	void UpdateStat(const FMHCharacterStat& BaseStat, const FMHCharacterStat& ModifierStat);
 	void UpdateHpBar(float NewCurrentHp);
+	FString GetHpStatText();
 
 protected:
 
 	UPROPERTY()
 	TObjectPtr<class UProgressBar> HpProgressBar;
+
+	UPROPERTY()
+	TObjectPtr<class UTextBlock> HpStat;
+
+	UPROPERTY()
+	float CurrentHp;
+
 
 	UPROPERTY()
 	float MaxHp;

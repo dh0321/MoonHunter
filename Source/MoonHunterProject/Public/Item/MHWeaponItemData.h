@@ -15,6 +15,15 @@ class MOONHUNTERPROJECT_API UMHWeaponItemData : public UMHItemData
 	GENERATED_BODY()
 	
 public:
+	UMHWeaponItemData();
+
+	FPrimaryAssetId GetPrimaryAssetId() const override
+	{
+		return FPrimaryAssetId("MHItemData", GetFName());
+	}
+	
+	
+public:
 	UPROPERTY(EditAnywhere, Category = Weapon)
 	TSoftObjectPtr<class USkeletalMesh> WeaponMesh;
 	

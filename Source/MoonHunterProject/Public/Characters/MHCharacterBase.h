@@ -7,6 +7,7 @@
 #include "Interface/MHAnimationAttackInterface.h"
 #include "Interface/MHCharacterWidgetInterface.h"
 #include "Interface/MHCharacterItemInterface.h"
+#include "GameData/MHCharacterStat.h"
 #include "MHCharacterBase.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogMHCharacter, Log, All);
@@ -125,6 +126,7 @@ protected:
 	virtual void SetupCharacterWidget(UMHUserWidget* InUserWidget);
 
 
+
 //Item Section
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Equipment, Meta = (AllowPrivateAccess = "true"))
@@ -138,5 +140,9 @@ protected:
 	virtual void DrinkPotion(class UMHItemData* InItemData);
 	virtual void ReadScroll(class UMHItemData* InItemData);
 
+
+//Stat Section
+public:
+	void ApplyStat(const FMHCharacterStat& BaseStat, const FMHCharacterStat& ModifierStat);
 
 };

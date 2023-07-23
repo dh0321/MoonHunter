@@ -15,6 +15,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include "Item/MHWeaponItemData.h"
+#include "Item/MHPotionItemData.h"
 
 DEFINE_LOG_CATEGORY(LogMHCharacter);
 
@@ -33,7 +34,7 @@ AMHCharacterBase::AMHCharacterBase()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
-	GetCharacterMovement()->JumpZVelocity = 700.f;
+	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
@@ -134,7 +135,7 @@ AMHCharacterBase::AMHCharacterBase()
 	//Widget Component
 	HpBar = CreateDefaultSubobject<UMHWidgetComponent>(TEXT("Widget"));
 	HpBar->SetupAttachment(GetMesh());
-	HpBar->SetRelativeLocation(FVector(0.0f, 0.0f, 220.0f));
+	HpBar->SetRelativeLocation(FVector(0.0f, 0.0f, 210.0f));
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/UI/WBP_HpBar.WBP_HpBar_C"));
 	if (HpBarWidgetRef.Class)
@@ -166,6 +167,7 @@ void AMHCharacterBase::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	Stat->OnHpZero.AddUObject(this, &AMHCharacterBase::SetDead);
+	Stat->OnStatChanged.AddUObject(this, &AMHCharacterBase::ApplyStat);
 }
 
 void AMHCharacterBase::SetCharacterControlData(const UMHCharacterControlData* CharacterControlData)
@@ -191,8 +193,9 @@ void AMHCharacterBase::SwapCharacter()
 		GetMesh()->SetHiddenInGame(false);
 		WolfMesh->SetHiddenInGame(true);
 		GetCharacterMovement()->MaxWalkSpeed = 650.f;
-		GetCharacterMovement()->JumpZVelocity = 700.f;
+		GetCharacterMovement()->JumpZVelocity = 600.f;
 		GetCharacterMovement()->AirControl = 0.35f;
+		HpBar->SetRelativeLocation(FVector(0.0f, 0.0f, 210.0f));
 	}
 	else
 	{
@@ -203,6 +206,8 @@ void AMHCharacterBase::SwapCharacter()
 		GetCharacterMovement()->MaxWalkSpeed = 650.f;
 		GetCharacterMovement()->JumpZVelocity = 490.f;
 		GetCharacterMovement()->AirControl = 0.35f;
+		HpBar->SetRelativeLocation(FVector(0.0f, 0.0f, 120.0f));
+
 	}
 
 	bIsWolf = !bIsWolf;
@@ -353,11 +358,13 @@ void AMHCharacterBase::SetupCharacterWidget(UMHUserWidget* InUserWidget)
 	UMHHpBarWidget* HpBarWidget = Cast<UMHHpBarWidget>(InUserWidget);
 	if (HpBarWidget)
 	{
-		HpBarWidget->SetMaxHp(Stat->GetTotalStat().MaxHp);
+		HpBarWidget->UpdateStat(Stat->GetBaseStat(), Stat->GetModifierStat());
 		HpBarWidget->UpdateHpBar(Stat->GetCurrentHp());
 		Stat->OnHpChanged.AddUObject(HpBarWidget, &UMHHpBarWidget::UpdateHpBar);
+		Stat->OnStatChanged.AddUObject(HpBarWidget, &UMHHpBarWidget::UpdateStat);
 	}
 }
+
 
 void AMHCharacterBase::TakeItem(UMHItemData* InItemData)
 {
@@ -387,11 +394,24 @@ void AMHCharacterBase::EquipWeapon(UMHItemData* InItemData)
 void AMHCharacterBase::DrinkPotion(UMHItemData* InItemData)
 {
 	UE_LOG(LogMHCharacter, Log, TEXT("Drink Potion"));
+
+	UMHPotionItemData* PotionItemData = Cast<UMHPotionItemData>(InItemData);
+	if (PotionItemData)
+	{
+		Stat->HealHp(PotionItemData->HealAmount);
+	}
+
 }
 
 void AMHCharacterBase::ReadScroll(UMHItemData* InItemData)
 {
 	UE_LOG(LogMHCharacter, Log, TEXT("Read Scroll"));
+}
+
+void AMHCharacterBase::ApplyStat(const FMHCharacterStat& BaseStat, const FMHCharacterStat& ModifierStat)
+{
+	float MovementSpeed = (BaseStat + ModifierStat).MovementSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
 }
 
 
