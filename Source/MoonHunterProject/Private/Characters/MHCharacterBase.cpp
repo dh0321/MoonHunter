@@ -128,6 +128,18 @@ AMHCharacterBase::AMHCharacterBase()
 		WolfDeadMontage = WolfDeadMontageRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> PersonHitMontageRef(TEXT("/Game/Animations/AnimMontage/AM_PersonHit.AM_PersonHit"));
+	if (PersonHitMontageRef.Object)
+	{
+		PersonHitMontage = PersonHitMontageRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> WolfHitMontageRef(TEXT("/Game/Animations/AnimMontage/AM_CatSimpleHit.AM_CatSimpleHit"));
+	if (WolfHitMontageRef.Object)
+	{
+		WolfHitMontage = WolfHitMontageRef.Object;
+	}
+
 
 	//Stat Component
 	Stat = CreateDefaultSubobject<UMHCharacterStatComponent>(TEXT("Stat"));
@@ -331,10 +343,16 @@ void AMHCharacterBase::AttackHitCheck()
 float AMHCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	
+	PlayHitAnimation();
 	Stat->ApplyDamage(DamageAmount);
-
+	
 	return DamageAmount;
+}
+
+void AMHCharacterBase::PlayHitAnimation()
+{
+	UAnimInstance* AnimInstance = GetCurrentMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(bIsWolf ? WolfHitMontage : PersonHitMontage, 1.0f);
 }
 
 void AMHCharacterBase::SetDead()

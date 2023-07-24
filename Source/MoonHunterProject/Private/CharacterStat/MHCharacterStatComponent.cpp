@@ -6,7 +6,7 @@
 
 UMHCharacterStatComponent::UMHCharacterStatComponent()
 {
-	CurrentLevel = 1;
+	CurrentLevel = 4;
 	AttackRadius = 50.0f;
 
 	bWantsInitializeComponent = true;

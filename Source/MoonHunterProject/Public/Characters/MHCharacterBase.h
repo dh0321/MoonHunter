@@ -49,6 +49,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = Effect)
 	TObjectPtr<class UNiagaraComponent> ChangeEffect;
 
+	UPROPERTY(VisibleAnywhere, Category = Character)
 	bool bIsWolf = false;
 
 	void SwapCharacter();
@@ -96,6 +97,17 @@ protected:
 protected:
 	virtual void AttackHitCheck() override;
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+
+// Hit Section
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> PersonHitMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> WolfHitMontage;
+
+	void PlayHitAnimation();
 
 
 //Dead Section

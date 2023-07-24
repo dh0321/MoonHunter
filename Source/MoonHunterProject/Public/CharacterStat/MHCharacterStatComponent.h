@@ -44,11 +44,11 @@ public:
 
 protected:
 	void SetHp(float NewHp);
-
-	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
+	//Transient, VisibleInstanceOnly
+	UPROPERTY(EditAnywhere, Category = Stat)
 	float CurrentHp;
 
-	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
+	UPROPERTY(EditAnywhere, Category = Stat)
 	float CurrentLevel;
 
 	UPROPERTY(VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
